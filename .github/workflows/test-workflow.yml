@@ -1,0 +1,24 @@
+# Only for testing this action in its own repo
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  validate_pr_title:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Checkout only needed for testing in own repo
+      # Omit checkout when adding to separate repo
+      - name: Clone repository to runner
+        uses: actions/checkout@v3
+
+      - name: Validate
+        uses: ./
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

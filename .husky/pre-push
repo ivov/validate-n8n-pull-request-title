@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Ensure the latest changes to dist are committed even if I forget.
+
+npm run compile
+
+if [ "$(git diff dist | wc -l)" -gt "0" ]; then
+  git add dist
+  git commit -m 'Update compiled action' --no-verify # `--no-verify` skips tests in pre-commit hook
+fi

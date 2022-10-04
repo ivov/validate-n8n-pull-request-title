@@ -1,0 +1,9 @@
+name: n8n-semantic-pull-request
+author: Iván Ovejero <ivov.src@gmail.com>
+description: Ensure a PR title matches n8n's version of the Conventional Commits spec
+runs:
+  using: "node16"
+  main: "dist/index.js"
+outputs:
+  validation_issues:
+    description: "Validation issues detected in the PR title"
