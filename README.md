@@ -55,7 +55,7 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: ivov/action-n8n-semantic-pull-request@v1.0.0
+      - uses: ivov/action-n8n-semantic-pull-request@v1
         id: validate_pr_title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
