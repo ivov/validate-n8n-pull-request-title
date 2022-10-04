@@ -100,7 +100,3 @@ test("Validation should fail for misspelled node scope", () => {
     .toHaveLength(1)
     .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Gmail Trigger Node`?");
 });
-
-test("Validation should pass for `n8n Node` scope (exception to lowercase initial)", () => {
-  expect(validate("feat(n8n Node): change default value")).toHaveLength(0);
-});
