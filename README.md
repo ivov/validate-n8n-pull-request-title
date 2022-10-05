@@ -8,7 +8,7 @@ GitHub Action to validate that PR titles in [`n8n-io/n8n`](https://github.com/n8
 2. Create `.github/workflows/validate-pr-title.yml` containing:
 
 ```yml
-name: "Validate PR title"
+name: Validate PR title
 
 on:
   pull_request:
