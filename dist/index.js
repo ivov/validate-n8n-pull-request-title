@@ -10271,7 +10271,34 @@ function getDisplayName(fileName: string) {
     };
   };
 
-  if (!descriptionPropertyDeclaration) return;
+  // for versioned nodes
+	// TODO: clean up
+	if (!descriptionPropertyDeclaration) {
+		type TargetConstructor = ts.SyntaxKind.Constructor & {
+			body: {
+				statements: Array<
+					ts.SyntaxKind.VariableStatement & {
+						declarationList: { declarations: ts.NodeArray<ts.VariableDeclaration> };
+					}
+				>;
+			};
+		};
+
+		const constructor = classDeclaration.members.find(
+			(m) => m.kind === ts.SyntaxKind.Constructor,
+		) as TargetConstructor | undefined;
+
+		if (!constructor) return;
+
+		const [varStatement] = constructor?.body?.statements;
+
+		if (!varStatement) return;
+
+		// @ts-ignore
+		descriptionPropertyDeclaration = varStatement.declarationList?.declarations[0];
+	}
+
+	if (!descriptionPropertyDeclaration) return;
 
   const propertyAssignment =
     descriptionPropertyDeclaration.initializer.properties.find(
