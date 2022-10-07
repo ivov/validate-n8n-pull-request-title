@@ -35,7 +35,7 @@ async function run() {
     // build /nodes-base so displayNames can be fetched
     if (/\(.* Node\)/.test(pullRequest.title)) {
       await exec(
-        "cd packages/nodes-base; npm i; node_modules/typescript/bin/tsc"
+        "cd packages/nodes-base; npm i; ../../node_modules/typescript/bin/tsc"
       );
     }
 
