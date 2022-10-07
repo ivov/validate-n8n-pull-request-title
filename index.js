@@ -6,7 +6,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const { validatePrTitle } = require("./src/validatePrTitle");
-const { PARSER_CONTENT } = require("./src/constants");
 
 async function run() {
   try {

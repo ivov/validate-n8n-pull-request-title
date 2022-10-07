@@ -29,10 +29,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-> **Warning**: Only the `pull_request` event may be used as a workflow trigger.
-
-3. Store `GITHUB_TOKEN` as a [repo secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository). Required for fetching the latest PR title on update.
-
 ## Output
 
 On validation failure, this action will populate the [`validation_issues` output](https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs). You can use this output in subsequent steps, e.g. to send the validation issue as a comment on the pull request.

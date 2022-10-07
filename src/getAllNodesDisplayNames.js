@@ -1,6 +1,7 @@
 const { exec: callbackExec } = require("child_process");
 const { promisify } = require("util");
 const exec = promisify(callbackExec);
+const { PARSER_CONTENT } = require("./constants");
 
 async function getAllNodesDisplayNames() {
   await exec("npm i typescript fast-glob");

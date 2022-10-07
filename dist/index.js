@@ -10307,6 +10307,7 @@ module.exports = {
 const { exec: callbackExec } = __nccwpck_require__(2081);
 const { promisify } = __nccwpck_require__(3837);
 const exec = promisify(callbackExec);
+const { PARSER_CONTENT } = __nccwpck_require__(4438);
 
 async function getAllNodesDisplayNames() {
   await exec("npm i typescript fast-glob");
@@ -10368,7 +10369,7 @@ const { getAllNodesDisplayNames } = __nccwpck_require__(2241);
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = __nccwpck_require__(4438);
 
 /**
- * Validate that a pull request title conforms to n8n semantic conventions.
+ * Validate that a pull request title conforms to n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
@@ -10678,7 +10679,6 @@ const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
 const { validatePrTitle } = __nccwpck_require__(3661);
-const { PARSER_CONTENT } = __nccwpck_require__(4438);
 
 async function run() {
   try {
