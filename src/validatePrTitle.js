@@ -74,22 +74,25 @@ async function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
+const allNodesDisplayNames = await getAllNodesDisplayNames();
+
 const isInvalidScope = async (str) => {
   if (!str) return true;
 
-  if (/, /.test(str)) {
-    return str.split(", ").some(isInvalidScope);
-  }
+  // if (/, /.test(str)) {
+  //   console.log("here");
+  //   // console.log(`result ${str}`, str.split(", ").some(isInvalidScope));
+  //   const scopes = str.split(", ");
 
-  if (!SCOPES.includes(str)) return true;
+  //   // return str.split(", ").some(async (s) => await isInvalidScope(s));
+  //   return await Promise.all(scopes.map(isInvalidScope));
+  // }
 
-  if (!str.endsWith(" Node")) return true;
+  if (SCOPES.some((scope) => str.includes(scope))) return false;
 
   // validate node scope
 
-  const allNodesDisplayNames = await getAllNodesDisplayNames();
-
-  console.log("allNodesDisplayNames", allNodesDisplayNames);
+  if (!str.endsWith(" Node")) return true;
 
   return !allNodesDisplayNames.some((name) => str.startsWith(name));
 };
@@ -117,6 +120,6 @@ const skipChangelogIsNotSuffix = (str) => {
 const escapeForRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const getClosestMatch = (str) =>
-  closest(str.split(" Node").shift(), getAllNodesDisplayNames());
+  closest(str.split(" Node").shift(), allNodesDisplayNames);
 
 module.exports = { validatePrTitle };
