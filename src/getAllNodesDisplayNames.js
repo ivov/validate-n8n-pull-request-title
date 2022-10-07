@@ -5,9 +5,11 @@ const exec = promisify(callbackExec);
 async function getAllNodesDisplayNames() {
   await exec("npm i typescript fast-glob");
   await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
-  const stringifiedArray = await exec("npx ts-node parser.ts");
+  const result = await exec("npx ts-node parser.ts");
 
-  return JSON.parse(stringifiedArray);
+  console.log("stringifiedArray", result.stdout);
+
+  return JSON.parse(result.stdout);
 }
 
 module.exports = {
