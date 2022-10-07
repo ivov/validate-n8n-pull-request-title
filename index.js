@@ -34,7 +34,7 @@ async function run() {
 
     // build /nodes-base so displayNames can be fetched
     if (/\(.* Node\)/.test(pullRequest.title)) {
-      await exec("npm run -w nodes-base build");
+      await exec("npm run -w packages/nodes-base build");
     }
 
     const issues = validatePrTitle(pullRequest.title);
