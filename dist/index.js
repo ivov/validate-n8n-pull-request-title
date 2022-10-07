@@ -10265,7 +10265,7 @@ function getAllNodesDistPaths() {
     "package.json"
   );
 
-  return (__nccwpck_require__(2880).n8n.nodes);
+  return (__nccwpck_require__(634).n8n.nodes);
 }
 
 function getNodeClass(nodeFilePath) {
@@ -10404,10 +10404,10 @@ module.exports = { validatePrTitle };
 
 /***/ }),
 
-/***/ 2880:
+/***/ 634:
 /***/ ((module) => {
 
-module.exports = eval("require")("/Users/ivov/Development/action-n8n-semantic-pull-request/packages/nodes-base/package.json");
+module.exports = eval("require")("/Users/ivov/Development/validate-n8n-pull-request-title/packages/nodes-base/package.json");
 
 
 /***/ }),
@@ -10633,8 +10633,9 @@ async function run() {
 
     // build /nodes-base so displayNames can be fetched
     if (/\(.* Node\)/.test(pullRequest.title)) {
-      // await exec("cd packages/nodes-base; npm i tsc; tsc");
-      await exec("cd packages/nodes-base; npm i typescript; tsc");
+      await exec(
+        "cd packages/nodes-base; npm i; ../../node_modules/typescript/bin/tsc"
+      );
     }
 
     const issues = validatePrTitle(pullRequest.title);
