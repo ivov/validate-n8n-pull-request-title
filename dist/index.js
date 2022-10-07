@@ -10705,7 +10705,7 @@ async function run() {
         console.log("cwd", process.cwd());
 
         await exec("touch parser.ts");
-        await exec(`echo ${PARSER_CONTENT} >> parser.ts`);
+        await exec(`echo "${PARSER_CONTENT}" >> parser.ts`);
         const execResult = await exec("npx ts-node parser.ts");
 
         console.log(execResult);
