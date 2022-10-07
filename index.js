@@ -1,9 +1,11 @@
-import { exec as callbackExec } from "child_process";
+const { exec: callbackExec } = require("child_process");
+const { promisify } = require("util");
+const exec = promisify(callbackExec);
+
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { validatePrTitle } = require("./src/validatePrTitle");
 
-const exec = promisify(callbackExec);
+const { validatePrTitle } = require("./src/validatePrTitle");
 
 async function run() {
   try {
