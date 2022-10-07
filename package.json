@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "format": "prettier . --write",
-    "build": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "build": "ncc build index.js -o dist --source-map --license licenses.txt; cp src/parser.ts dist",
     "test": "jest"
   },
   "keywords": [
@@ -30,7 +30,9 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
+    "fast-glob": "^3.2.12",
     "fastest-levenshtein": "^1.0.16",
+    "typescript": "^4.8.4",
     "verbutils": "^0.0.1"
   },
   "devDependencies": {

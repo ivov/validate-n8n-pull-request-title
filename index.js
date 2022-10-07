@@ -35,11 +35,16 @@ async function run() {
     // build /nodes-base so displayNames can be fetched
     if (/\(.* Node\)/.test(pullRequest.title)) {
       try {
-        await exec(
-          "cd packages/nodes-base; npm i; ../../node_modules/typescript/bin/tsc"
-        );
-      } catch (e) {
-        console.log(e);
+        // copy parser.ts onto n8n root in runner
+        // run parser.ts to get display names
+
+        console.log("cwd", process.cwd());
+
+        const execResult = await exec("npx ts-node parser.ts");
+
+        console.log(execResult);
+      } catch (error) {
+        console.log(error);
       }
     }
 
