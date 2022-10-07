@@ -10226,17 +10226,17 @@ const ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY = [
 ];
 
 const PARSER_CONTENT = `
-import { readFileSync } from "fs";
-import glob from "fast-glob";
-import ts from "typescript";
+import { readFileSync } from \\"fs\\";
+import glob from \\"fast-glob\\";
+import ts from \\"typescript\\";
 
 async function getDisplayNames() {
-  const files = await glob("packages/nodes-base/nodes/**/*.node.ts");
+  const files = await glob(\\"packages/nodes-base/nodes/**/*.node.ts\\");
 
   return files.reduce<string[]>((acc, cur) => {
     const displayName = getDisplayName(cur);
 
-    // main file for versioned node has no \`description\`
+    // main file for versioned node has no description
     // e.g. packages/nodes-base/nodes/BambooHr/BambooHr.node.ts
     if (displayName) acc.push(displayName);
 
@@ -10263,7 +10263,7 @@ function getDisplayName(fileName: string) {
     .find(
       (m) =>
         m.name?.kind === ts.SyntaxKind.Identifier &&
-        m.name.escapedText === "description" &&
+        m.name.escapedText === \\"description\\" &&
         m.initializer?.kind === ts.SyntaxKind.ObjectLiteralExpression
     ) as ts.PropertyDeclaration & {
     initializer: ts.SyntaxKind.ObjectLiteralExpression & {
@@ -10278,7 +10278,7 @@ function getDisplayName(fileName: string) {
       (p) =>
         p.kind === ts.SyntaxKind.PropertyAssignment &&
         p.name.kind === ts.SyntaxKind.Identifier &&
-        p.name.escapedText === "displayName" &&
+        p.name.escapedText === \\"displayName\\" &&
         p.initializer.kind === ts.SyntaxKind.StringLiteral
     ) as ts.PropertyAssignment & { initializer: { text: string } };
 
@@ -10705,8 +10705,7 @@ async function run() {
         console.log("cwd", process.cwd());
 
         await exec("npm i typescript fast-glob");
-        await exec("touch parser.ts");
-        await exec(`echo "${PARSER_CONTENT}" >> parser.ts`);
+        await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
         const execResult = await exec("npx ts-node parser.ts");
 
         console.log(execResult);
