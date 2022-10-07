@@ -4,7 +4,7 @@
 
 # Ensure the latest changes to dist are committed even if I forget.
 
-npm run compile
+npm run build
 
 if [ "$(git diff dist | wc -l)" -gt "0" ]; then
   git add dist

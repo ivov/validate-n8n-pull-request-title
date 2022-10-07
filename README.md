@@ -1,4 +1,4 @@
-# action-n8n-semantic-pull-request
+# validate-n8n-pull-request-title
 
 GitHub Action to validate that PR titles in [`n8n-io/n8n`](https://github.com/n8n-io/n8n) match [n8n's version](https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8) of the Conventional Commits spec.
 
@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Validate PR title
-        uses: ivov/action-n8n-semantic-pull-request@v1
+        uses: ivov/validate-n8n-pull-request-title@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -55,15 +55,15 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: ivov/action-n8n-semantic-pull-request@v1
-        id: validate_pr_title
+      - uses: ivov/validate-n8n-pull-request-title@v1
+        id: validate_n8n_pull_request_title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: marocchino/sticky-pull-request-comment@v2
         if: always() # ensure workflow continues executing despite validation errors
         with:
-          header: pr_title_failed_validation
+          header: pr_title_failed_validation # tag comment for later deletion
           message: |
             Thank you for your contribution!
 
@@ -72,10 +72,10 @@ jobs:
             Therefore, we ask you to adjust your PR title to solve the issue(s) below:
 
             ```
-            ${{ steps.validate_pr_title.outputs.validation_issues }}
+            ${{ steps.validate_n8n_pull_request_title.outputs.validation_issues }}
             ```
 
-      - if: ${{ steps.validate_pr_title.outputs.validation_issues == null }}
+      - if: ${{ steps.validate_n8n_pull_request_title.outputs.validation_issues == null }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_title_failed_validation

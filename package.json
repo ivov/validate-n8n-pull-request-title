@@ -1,11 +1,11 @@
 {
-  "name": "action-n8n-semantic-pull-request",
+  "name": "validate-n8n-pull-request-title",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "format": "prettier . --write",
-    "compile": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "build": "ncc build index.js -o dist --source-map --license licenses.txt",
     "test": "jest"
   },
   "keywords": [
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ivov/action-n8n-semantic-pull-request.git"
+    "url": "https://github.com/ivov/validate-n8n-pull-request-title.git"
   },
   "author": {
     "name": "Iván Ovejero",

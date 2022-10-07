@@ -46,7 +46,7 @@ async function run() {
 
     console.info("PR title validated successfully");
   } catch (error) {
-    console.error("action-n8n-semantic-pull-request failed to run");
+    console.error("validate-n8n-pull-request-title failed to run");
     core.setFailed(error.message);
   }
 }
