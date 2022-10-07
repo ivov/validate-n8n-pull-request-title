@@ -466,7 +466,7 @@ function getDisplayName(fileName: string) {
   return propertyAssignment.initializer.text;
 }
 
-getDisplayNames().then(console.log);
+getDisplayNames().then(JSON.stringify);
 `;
 
 module.exports = {

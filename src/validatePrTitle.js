@@ -1,14 +1,14 @@
 const { closest } = require("fastest-levenshtein");
 const { toBaseForm } = require("verbutils")();
-const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = require("./constants");
 const { getAllNodesDisplayNames } = require("./getAllNodesDisplayNames");
+const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = require("./constants");
 
 /**
  * Validate that a pull request title conforms to n8n semantic conventions.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
-function validatePrTitle(title) {
+async function validatePrTitle(title) {
   const match = title.match(REGEXES.CONVENTIONAL_SCHEMA);
 
   // general validation
@@ -35,7 +35,7 @@ function validatePrTitle(title) {
 
   const { scope } = match.groups;
 
-  if (scope && isInvalidScope(scope)) {
+  if (scope && (await isInvalidScope(scope))) {
     let issue = ERRORS.INVALID_SCOPE;
 
     if (scope.endsWith(" Node")) {
@@ -74,19 +74,25 @@ function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
-const isInvalidScope = (str) => {
+const isInvalidScope = async (str) => {
   if (!str) return true;
 
   if (/, /.test(str)) {
     return str.split(", ").some(isInvalidScope);
   }
 
-  return !SCOPES.includes(str) && !isValidNodeScope(str);
-};
+  if (!SCOPES.includes(str)) return true;
 
-const isValidNodeScope = (str) =>
-  getAllNodesDisplayNames().some((name) => str.startsWith(name)) &&
-  str.endsWith(" Node");
+  if (!str.endsWith(" Node")) return true;
+
+  // validate node scope
+
+  const allNodesDisplayNames = await getAllNodesDisplayNames();
+
+  console.log("allNodesDisplayNames", allNodesDisplayNames);
+
+  return !allNodesDisplayNames.some((name) => str.startsWith(name));
+};
 
 const startsWithUpperCase = (str) => /[A-Z]/.test(str.charAt(0));
 

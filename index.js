@@ -33,25 +33,19 @@ async function run() {
       pull_number: contextPullRequest.number,
     });
 
-    // build /nodes-base so displayNames can be fetched
-    if (/\(.* Node\)/.test(pullRequest.title)) {
-      try {
-        // copy parser.ts onto n8n root in runner
-        // run parser.ts to get display names
+    // if (/\(.* Node\)/.test(pullRequest.title)) {
+    //   try {
+    //     // console.log("cwd", process.cwd());
+    //     // await exec("npm i typescript fast-glob");
+    //     // await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
+    //     // const execResult = await exec("npx ts-node parser.ts");
+    //     // console.log(execResult);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
 
-        console.log("cwd", process.cwd());
-
-        await exec("npm i typescript fast-glob");
-        await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
-        const execResult = await exec("npx ts-node parser.ts");
-
-        console.log(execResult);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    const issues = validatePrTitle(pullRequest.title);
+    const issues = await validatePrTitle(pullRequest.title);
 
     if (issues.length > 0) {
       console.error("PR title failed validation");

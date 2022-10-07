@@ -10285,7 +10285,7 @@ function getDisplayName(fileName: string) {
   return propertyAssignment.initializer.text;
 }
 
-getDisplayNames().then(console.log);
+getDisplayNames().then(JSON.stringify);
 `;
 
 module.exports = {
@@ -10304,43 +10304,55 @@ module.exports = {
 /***/ 2241:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const path = __nccwpck_require__(1017);
+const { exec: callbackExec } = __nccwpck_require__(2081);
+const { promisify } = __nccwpck_require__(3837);
+const exec = promisify(callbackExec);
 
-/**
- * @returns ["Action Network", "Active Campaign", etc.]
- */
-function getAllNodesDisplayNames() {
-  return getAllNodesDistPaths().map((distPath) => {
-    const nodeFilePath = path.resolve("packages", "nodes-base", distPath);
-    const NodeClass = getNodeClass(nodeFilePath);
-    const node = new NodeClass();
+async function getAllNodesDisplayNames() {
+  await exec("npm i typescript fast-glob");
+  await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
+  const stringifiedArray = await exec("npx ts-node parser.ts");
 
-    return node.description.displayName;
-  });
-}
-
-/**
- * @returns ["dist/nodes/ActionNetwork/ActionNetwork.node.js", etc.]
- */
-function getAllNodesDistPaths() {
-  const nodesBasePackageJsonPath = path.resolve(
-    "packages",
-    "nodes-base",
-    "package.json"
-  );
-
-  return (__nccwpck_require__(634).n8n.nodes);
-}
-
-function getNodeClass(nodeFilePath) {
-  const className = nodeFilePath.split("/").pop().replace(".node.js", "");
-
-  return require(nodeFilePath)[className];
+  return JSON.parse(stringifiedArray);
 }
 
 module.exports = {
   getAllNodesDisplayNames,
 };
+
+// const path = require("path");
+
+// /**
+//  * @returns ["Action Network", "Active Campaign", etc.]
+//  */
+// function getAllNodesDisplayNames() {
+//   return getAllNodesDistPaths().map((distPath) => {
+//     const nodeFilePath = path.resolve("packages", "nodes-base", distPath);
+//     const NodeClass = getNodeClass(nodeFilePath);
+//     const node = new NodeClass();
+
+//     return node.description.displayName;
+//   });
+// }
+
+// /**
+//  * @returns ["dist/nodes/ActionNetwork/ActionNetwork.node.js", etc.]
+//  */
+// function getAllNodesDistPaths() {
+//   const nodesBasePackageJsonPath = path.resolve(
+//     "packages",
+//     "nodes-base",
+//     "package.json"
+//   );
+
+//   return require(nodesBasePackageJsonPath).n8n.nodes;
+// }
+
+// function getNodeClass(nodeFilePath) {
+//   const className = nodeFilePath.split("/").pop().replace(".node.js", "");
+
+//   return require(nodeFilePath)[className];
+// }
 
 
 /***/ }),
@@ -10350,15 +10362,15 @@ module.exports = {
 
 const { closest } = __nccwpck_require__(82);
 const { toBaseForm } = __nccwpck_require__(8542)();
-const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = __nccwpck_require__(4438);
 const { getAllNodesDisplayNames } = __nccwpck_require__(2241);
+const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = __nccwpck_require__(4438);
 
 /**
  * Validate that a pull request title conforms to n8n semantic conventions.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
-function validatePrTitle(title) {
+async function validatePrTitle(title) {
   const match = title.match(REGEXES.CONVENTIONAL_SCHEMA);
 
   // general validation
@@ -10385,7 +10397,7 @@ function validatePrTitle(title) {
 
   const { scope } = match.groups;
 
-  if (scope && isInvalidScope(scope)) {
+  if (scope && (await isInvalidScope(scope))) {
     let issue = ERRORS.INVALID_SCOPE;
 
     if (scope.endsWith(" Node")) {
@@ -10424,19 +10436,25 @@ function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
-const isInvalidScope = (str) => {
+const isInvalidScope = async (str) => {
   if (!str) return true;
 
   if (/, /.test(str)) {
     return str.split(", ").some(isInvalidScope);
   }
 
-  return !SCOPES.includes(str) && !isValidNodeScope(str);
-};
+  if (!SCOPES.includes(str)) return true;
 
-const isValidNodeScope = (str) =>
-  getAllNodesDisplayNames().some((name) => str.startsWith(name)) &&
-  str.endsWith(" Node");
+  if (!str.endsWith(" Node")) return true;
+
+  // validate node scope
+
+  const allNodesDisplayNames = await getAllNodesDisplayNames();
+
+  console.log("allNodesDisplayNames", allNodesDisplayNames);
+
+  return !allNodesDisplayNames.some((name) => str.startsWith(name));
+};
 
 const startsWithUpperCase = (str) => /[A-Z]/.test(str.charAt(0));
 
@@ -10464,14 +10482,6 @@ const getClosestMatch = (str) =>
   closest(str.split(" Node").shift(), getAllNodesDisplayNames());
 
 module.exports = { validatePrTitle };
-
-
-/***/ }),
-
-/***/ 634:
-/***/ ((module) => {
-
-module.exports = eval("require")("/Users/ivov/Development/validate-n8n-pull-request-title/packages/nodes-base/package.json");
 
 
 /***/ }),
@@ -10696,25 +10706,19 @@ async function run() {
       pull_number: contextPullRequest.number,
     });
 
-    // build /nodes-base so displayNames can be fetched
-    if (/\(.* Node\)/.test(pullRequest.title)) {
-      try {
-        // copy parser.ts onto n8n root in runner
-        // run parser.ts to get display names
+    // if (/\(.* Node\)/.test(pullRequest.title)) {
+    //   try {
+    //     // console.log("cwd", process.cwd());
+    //     // await exec("npm i typescript fast-glob");
+    //     // await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
+    //     // const execResult = await exec("npx ts-node parser.ts");
+    //     // console.log(execResult);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
 
-        console.log("cwd", process.cwd());
-
-        await exec("npm i typescript fast-glob");
-        await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
-        const execResult = await exec("npx ts-node parser.ts");
-
-        console.log(execResult);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    const issues = validatePrTitle(pullRequest.title);
+    const issues = await validatePrTitle(pullRequest.title);
 
     if (issues.length > 0) {
       console.error("PR title failed validation");
