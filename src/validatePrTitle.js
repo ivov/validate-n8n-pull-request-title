@@ -77,6 +77,10 @@ const isInvalidType = (str) => !TYPES.includes(str);
 const isInvalidScope = (str) => {
   if (!str) return true;
 
+  if (/, /.test(str)) {
+    return str.split(", ").some(isInvalidScope);
+  }
+
   return !SCOPES.includes(str) && !isValidNodeScope(str);
 };
 
