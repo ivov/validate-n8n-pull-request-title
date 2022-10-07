@@ -10316,9 +10316,9 @@ async function getAllNodesDisplayNames() {
   await exec("npm i typescript fast-glob");
   await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
   const result = await exec("npx ts-node parser.ts");
-  console.log("result", result);
+  console.log("result", result.stdout);
 
-  return JSON.parse(result);
+  return JSON.parse(result.stdout);
 }
 
 module.exports = {
