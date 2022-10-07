@@ -436,7 +436,7 @@ function getDisplayName(fileName: string) {
     (s) => s.kind === ts.SyntaxKind.ClassDeclaration
   ) as ts.ClassDeclaration;
 
-  const descriptionPropertyDeclaration = classDeclaration.members
+  let descriptionPropertyDeclaration = classDeclaration.members
     .filter(
       (m): m is ts.PropertyDeclaration =>
         m.kind === ts.SyntaxKind.PropertyDeclaration
