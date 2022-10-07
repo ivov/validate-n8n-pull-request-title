@@ -6,6 +6,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 const { validatePrTitle } = require("./src/validatePrTitle");
+const { PARSER_CONTENT } = require("./src/constants");
 
 async function run() {
   try {
@@ -40,6 +41,8 @@ async function run() {
 
         console.log("cwd", process.cwd());
 
+        await exec("touch parser.ts");
+        await exec(`echo ${PARSER_CONTENT} >> parser.ts`);
         const execResult = await exec("npx ts-node parser.ts");
 
         console.log(execResult);

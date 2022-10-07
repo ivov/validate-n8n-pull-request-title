@@ -10225,6 +10225,69 @@ const ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY = [
   "Zulip",
 ];
 
+const PARSER_CONTENT = `
+import { readFileSync } from "fs";
+import glob from "fast-glob";
+import ts from "typescript";
+
+async function getDisplayNames() {
+  const files = await glob("packages/nodes-base/nodes/**/*.node.ts");
+
+  return files.reduce<string[]>((acc, cur) => {
+    const displayName = getDisplayName(cur);
+
+    // main file for versioned node has no \`description\`
+    // e.g. packages/nodes-base/nodes/BambooHr/BambooHr.node.ts
+    if (displayName) acc.push(displayName);
+
+    return acc;
+  }, []);
+}
+
+function getDisplayName(fileName: string) {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    readFileSync(fileName).toString(),
+    ts.ScriptTarget.ES2015
+  );
+
+  const classDeclaration = sourceFile.statements.find(
+    (s) => s.kind === ts.SyntaxKind.ClassDeclaration
+  ) as ts.ClassDeclaration;
+
+  const descriptionPropertyDeclaration = classDeclaration.members
+    .filter(
+      (m): m is ts.PropertyDeclaration =>
+        m.kind === ts.SyntaxKind.PropertyDeclaration
+    )
+    .find(
+      (m) =>
+        m.name?.kind === ts.SyntaxKind.Identifier &&
+        m.name.escapedText === "description" &&
+        m.initializer?.kind === ts.SyntaxKind.ObjectLiteralExpression
+    ) as ts.PropertyDeclaration & {
+    initializer: ts.SyntaxKind.ObjectLiteralExpression & {
+      properties: ts.PropertyAssignment[];
+    };
+  };
+
+  if (!descriptionPropertyDeclaration) return;
+
+  const propertyAssignment =
+    descriptionPropertyDeclaration.initializer.properties.find(
+      (p) =>
+        p.kind === ts.SyntaxKind.PropertyAssignment &&
+        p.name.kind === ts.SyntaxKind.Identifier &&
+        p.name.escapedText === "displayName" &&
+        p.initializer.kind === ts.SyntaxKind.StringLiteral
+    ) as ts.PropertyAssignment & { initializer: { text: string } };
+
+  return propertyAssignment.initializer.text;
+}
+
+getDisplayNames();
+`;
+
 module.exports = {
   TYPES,
   SCOPES,
@@ -10232,6 +10295,7 @@ module.exports = {
   ERRORS,
   REGEXES,
   ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY,
+  PARSER_CONTENT,
 };
 
 
@@ -10605,6 +10669,7 @@ const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
 const { validatePrTitle } = __nccwpck_require__(3661);
+const { PARSER_CONTENT } = __nccwpck_require__(4438);
 
 async function run() {
   try {
@@ -10639,6 +10704,8 @@ async function run() {
 
         console.log("cwd", process.cwd());
 
+        await exec("touch parser.ts");
+        await exec(`echo ${PARSER_CONTENT} >> parser.ts`);
         const execResult = await exec("npx ts-node parser.ts");
 
         console.log(execResult);
