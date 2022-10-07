@@ -10340,9 +10340,10 @@ const { PARSER_CONTENT } = __nccwpck_require__(4438);
  * @returns { Promise<string[]> } e.g. ["Action Network", "Active Campaign", etc.]
  */
 async function getAllNodesDisplayNames() {
-  await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
+  await exec(
+    `npm i typescript; touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`
+  );
   const result = await exec("npx ts-node parser.ts");
-  console.log("result", result.stdout);
 
   return JSON.parse(result.stdout);
 }
