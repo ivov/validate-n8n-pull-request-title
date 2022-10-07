@@ -10399,14 +10399,16 @@ async function validatePrTitle(title) {
 
   const { scope } = match.groups;
 
-  if (scope && (await isInvalidScope(scope))) {
-    let issue = ERRORS.INVALID_SCOPE;
+  if (scope && isBaseInvalidScope(scope) && !scope.endsWith(" Node")) {
+    issues.push(ERRORS.INVALID_SCOPE);
+  } else if (scope && scope.endsWith(" Node")) {
+    const names = await getAllNodesDisplayNames();
 
-    if (scope.endsWith(" Node")) {
-      issue += `. Did you mean \`${getClosestMatch(scope)} Node\`?`;
+    if (isInvalidNodeScope(scope, names)) {
+      const closest = getClosestMatch(scope, names);
+      const supplement = `. Did you mean \`${closest} Node\`?`;
+      issues.push(ERRORS.INVALID_SCOPE + supplement);
     }
-
-    issues.push(issue);
   }
 
   // subject validation
@@ -10438,25 +10440,20 @@ async function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
-const isInvalidScope = async (str) => {
-  if (!str) return true;
+const isBaseInvalidScope = (str) =>
+  !SCOPES.some((scope) => str.includes(scope));
 
-  if (/, /.test(str)) {
-    return str.split(", ").some(isInvalidScope);
-  }
+// if (/, /.test(str)) {
+//   console.log("here");
+//   // console.log(`result ${str}`, str.split(", ").some(isInvalidScope));
+//   const scopes = str.split(", ");
 
-  if (!SCOPES.includes(str)) return true;
+//   // return str.split(", ").some(async (s) => await isInvalidScope(s));
+//   return await Promise.all(scopes.map(isInvalidScope));
+// }
 
-  if (!str.endsWith(" Node")) return true;
-
-  // validate node scope
-
-  const allNodesDisplayNames = await getAllNodesDisplayNames();
-
-  console.log("allNodesDisplayNames", allNodesDisplayNames);
-
-  return !allNodesDisplayNames.some((name) => str.startsWith(name));
-};
+const isInvalidNodeScope = (str, allNodesDisplayNames) =>
+  !allNodesDisplayNames.some((name) => str.startsWith(name));
 
 const startsWithUpperCase = (str) => /[A-Z]/.test(str.charAt(0));
 
@@ -10480,8 +10477,8 @@ const skipChangelogIsNotSuffix = (str) => {
 
 const escapeForRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const getClosestMatch = (str) =>
-  closest(str.split(" Node").shift(), getAllNodesDisplayNames());
+const getClosestMatch = (str, names) =>
+  closest(str.split(" Node").shift(), names);
 
 module.exports = { validatePrTitle };
 
