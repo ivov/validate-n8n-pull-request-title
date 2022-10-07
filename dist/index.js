@@ -10226,71 +10226,107 @@ const ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY = [
 ];
 
 const PARSER_CONTENT = `
-import { readFileSync } from \\"fs\\";
-import glob from \\"fast-glob\\";
-import ts from \\"typescript\\";
+import { readFileSync } from 'fs';
+import glob from 'fast-glob';
+import ts from 'typescript';
 
 async function getDisplayNames() {
-  const files = await glob(\\"packages/nodes-base/nodes/**/*.node.ts\\");
+	const files = await Promise.all([
+		glob('packages/nodes-base/nodes/**/*.node.ts'),
+		glob('packages/nodes-base/nodes/**/versionDescription.ts'),
+	]);
 
-  return files.reduce<string[]>((acc, cur) => {
-    const displayName = getDisplayName(cur);
+	const names = files.flat().reduce<string[]>((acc, cur) => {
+		const displayName = getDisplayName(cur);
 
-    // main file for versioned node has no description
-    // e.g. packages/nodes-base/nodes/BambooHr/BambooHr.node.ts
-    if (displayName) acc.push(displayName);
+		// main file for versioned node has no description
+		// e.g. packages/nodes-base/nodes/BambooHr/BambooHr.node.ts
+		if (displayName) acc.push(displayName);
 
-    return acc;
-  }, []);
+		return acc;
+	}, []);
+
+	return [...new Set(names)];
 }
 
-function getDisplayName(fileName: string) {
-  const sourceFile = ts.createSourceFile(
-    fileName,
-    readFileSync(fileName).toString(),
-    ts.ScriptTarget.ES2015
-  );
+function getDisplayName(filename: string) {
+	const sourceFile = ts.createSourceFile(
+		filename,
+		readFileSync(filename).toString(),
+		ts.ScriptTarget.ES2015,
+	);
 
-  const classDeclaration = sourceFile.statements.find(
-    (s) => s.kind === ts.SyntaxKind.ClassDeclaration
-  ) as ts.ClassDeclaration;
+	/**
+	 * Unversioned node: description.displayName in *.node.ts
+	 */
 
-  let descriptionPropertyDeclaration = classDeclaration.members
-    .filter(
-      (m): m is ts.PropertyDeclaration =>
-        m.kind === ts.SyntaxKind.PropertyDeclaration
-    )
-    .find(
-      (m) =>
-        m.name?.kind === ts.SyntaxKind.Identifier &&
-        m.name.escapedText === \\"description\\" &&
-        m.initializer?.kind === ts.SyntaxKind.ObjectLiteralExpression
-    ) as ts.PropertyDeclaration & {
-    initializer: ts.SyntaxKind.ObjectLiteralExpression & {
-      properties: ts.PropertyAssignment[];
-    };
-  };
+	const classDeclaration = sourceFile.statements.find(
+		(s) => s.kind === ts.SyntaxKind.ClassDeclaration,
+	) as ts.ClassDeclaration;
 
-  // for versioned nodes
-	// TODO: clean up
+	let descriptionPropertyDeclaration = classDeclaration?.members
+		.filter((m): m is ts.PropertyDeclaration => m.kind === ts.SyntaxKind.PropertyDeclaration)
+		.find(
+			(m) =>
+				m.name?.kind === ts.SyntaxKind.Identifier &&
+				'description' === m.name.escapedText &&
+				m.initializer?.kind === ts.SyntaxKind.ObjectLiteralExpression,
+		) as ts.PropertyDeclaration & {
+		initializer: ts.SyntaxKind.ObjectLiteralExpression & { properties: ts.PropertyAssignment[] };
+	};
+
+	/**
+	 * Versioned node: versionDescription.ts
+	 * e.g. BambooHr
+	 */
+	if (!descriptionPropertyDeclaration && filename.endsWith('versionDescription.ts')) {
+		const variableStatement = sourceFile.statements.find(
+			(s) => s.kind === ts.SyntaxKind.VariableStatement,
+		) as ts.VariableStatement;
+
+		const declaration = variableStatement.declarationList.declarations.find(
+			(d) =>
+				d.name.kind === ts.SyntaxKind.Identifier && d.name.escapedText === 'versionDescription',
+		) as
+			| {
+					initializer: ts.SyntaxKind.ObjectLiteralExpression & {
+						properties: ts.PropertyAssignment[];
+					};
+			  }
+			| undefined;
+
+		const property = declaration?.initializer?.properties?.find(
+			(p) =>
+				p.name.kind === ts.SyntaxKind.Identifier &&
+				p.name.escapedText === 'displayName' &&
+				p.initializer.kind === ts.SyntaxKind.StringLiteral,
+		) as { initializer: ts.ObjectLiteralExpression & { text: string } } | undefined;
+
+		if (property?.initializer?.text) return property?.initializer?.text;
+	}
+
+	/**
+	 * Versioned node: baseDescription.displayName in *.node.ts
+	 * e.g. Notion
+	 */
 	if (!descriptionPropertyDeclaration) {
-		type TargetConstructor = ts.SyntaxKind.Constructor & {
-			body: {
-				statements: Array<
-					ts.SyntaxKind.VariableStatement & {
-						declarationList: { declarations: ts.NodeArray<ts.VariableDeclaration> };
-					}
-				>;
-			};
-		};
-
-		const constructor = classDeclaration.members.find(
+		const constructor = classDeclaration?.members.find(
 			(m) => m.kind === ts.SyntaxKind.Constructor,
-		) as TargetConstructor | undefined;
+		) as
+			| (ts.SyntaxKind.Constructor & {
+					body: {
+						statements: Array<
+							ts.VariableStatement & {
+								declarationList: { declarations: ts.VariableDeclaration[] };
+							}
+						>;
+					};
+			  })
+			| undefined;
 
 		if (!constructor) return;
 
-		const [varStatement] = constructor?.body?.statements;
+		const varStatement = constructor?.body?.statements[0];
 
 		if (!varStatement) return;
 
@@ -10300,20 +10336,25 @@ function getDisplayName(fileName: string) {
 
 	if (!descriptionPropertyDeclaration) return;
 
-  const propertyAssignment =
-    descriptionPropertyDeclaration.initializer.properties.find(
-      (p) =>
-        p.kind === ts.SyntaxKind.PropertyAssignment &&
-        p.name.kind === ts.SyntaxKind.Identifier &&
-        p.name.escapedText === \\"displayName\\" &&
-        p.initializer.kind === ts.SyntaxKind.StringLiteral
-    ) as ts.PropertyAssignment & { initializer: { text: string } };
+	return extractDisplayNameFromInitializer(descriptionPropertyDeclaration.initializer);
+}
 
-  return propertyAssignment.initializer.text;
+function extractDisplayNameFromInitializer(
+	initializer: ts.SyntaxKind.ObjectLiteralExpression & { properties: ts.PropertyAssignment[] },
+) {
+	const propertyAssignment = initializer.properties.find(
+		(p) =>
+			p.kind === ts.SyntaxKind.PropertyAssignment &&
+			p.name.kind === ts.SyntaxKind.Identifier &&
+			p.name.escapedText === 'displayName' &&
+			p.initializer.kind === ts.SyntaxKind.StringLiteral,
+	) as ts.PropertyAssignment & { initializer: { text: string } };
+
+	return propertyAssignment.initializer.text;
 }
 
 getDisplayNames().then((result) => console.log(JSON.stringify(result)));
-`;
+`.replace(/'/g, '\\"');
 
 module.exports = {
   TYPES,
