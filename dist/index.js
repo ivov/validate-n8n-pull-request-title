@@ -10285,7 +10285,7 @@ function getDisplayName(fileName: string) {
   return propertyAssignment.initializer.text;
 }
 
-getDisplayNames();
+getDisplayNames().then(console.log);
 `;
 
 module.exports = {
