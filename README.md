@@ -51,12 +51,14 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: ivov/validate-n8n-pull-request-title@v1
-        id: validate_n8n_pull_request_title
+      - name: Validate PR title
+        uses: ivov/validate-n8n-pull-request-title@v1
+        id: validate_pr_title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - name: Post validation issue as comment
+        uses: marocchino/sticky-pull-request-comment@v2
         if: always() # ensure workflow continues executing despite validation errors
         with:
           header: pr_title_failed_validation # tag comment for later deletion
@@ -68,10 +70,11 @@ jobs:
             Therefore, we ask you to adjust your PR title to solve the issue(s) below:
 
             ```
-            ${{ steps.validate_n8n_pull_request_title.outputs.validation_issues }}
+            ${{ steps.validate_pr_title.outputs.validation_issues }}
             ```
 
-      - if: ${{ steps.validate_n8n_pull_request_title.outputs.validation_issues == null }}
+      - name: Remove validation issue comment once resolved
+        if: ${{ steps.validate_pr_title.outputs.validation_issues == null }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_title_failed_validation
