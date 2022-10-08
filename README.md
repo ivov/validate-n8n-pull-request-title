@@ -48,7 +48,7 @@ on:
 
 jobs:
   main:
-    name: Validate PR title
+    name: Validate PR title and notify
     runs-on: ubuntu-latest
     steps:
       - name: Validate PR title
@@ -61,7 +61,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         if: always() # ensure workflow continues executing despite validation errors
         with:
-          header: pr_title_failed_validation # tag comment for later deletion
+          header: pr_title_failed_validation # for later deletion
           message: |
             Thank you for your contribution!
 
@@ -78,7 +78,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_title_failed_validation
-          delete: true # delete prior comment when issue is resolved
+          delete: true
 ````
 
 </details>

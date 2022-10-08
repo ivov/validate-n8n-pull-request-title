@@ -4,7 +4,7 @@ const { getAllNodesDisplayNames } = require("./getAllNodesDisplayNames");
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = require("./constants");
 
 /**
- * Validate that a pull request title conforms to n8n's version of the Conventional Commits spec.
+ * Validate that a pull request title match n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
@@ -35,15 +35,14 @@ async function validatePrTitle(title) {
 
   const { scope } = match.groups;
 
-  if (scope && isBaseInvalidScope(scope) && !scope.endsWith(" Node")) {
-    issues.push(ERRORS.INVALID_SCOPE);
-  } else if (scope && scope.endsWith(" Node")) {
-    const names = await getAllNodesDisplayNames();
-
-    if (isInvalidNodeScope(scope, names)) {
-      const closest = getClosestMatch(scope, names);
-      const supplement = `. Did you mean \`${closest} Node\`?`;
-      issues.push(ERRORS.INVALID_SCOPE + supplement);
+  if (scope) {
+    if (/,\S/.test(scope)) {
+      issues.push(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);
+    } else {
+      const scopeIssues = await Promise.all(
+        scope.split(", ").map(getScopeIssue)
+      );
+      issues.push(...scopeIssues.filter((scopeIssue) => scopeIssue !== null));
     }
   }
 
@@ -63,8 +62,8 @@ async function validatePrTitle(title) {
     issues.push(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
   }
 
-  if (hasSkipChangelog(subject) && skipChangelogIsNotSuffix(subject)) {
-    issues.push(ERRORS.SKIP_CHANGELOG_NOT_SUFFIX);
+  if (hasSkipChangelog(subject) && skipChangelogIsNotInFinalPosition(subject)) {
+    issues.push(ERRORS.SKIP_CHANGELOG_NOT_IN_FINAL_POSITION);
   }
 
   return issues;
@@ -76,24 +75,29 @@ async function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
-const isBaseInvalidScope = (str) =>
-  !SCOPES.some((scope) => str.includes(scope));
-
-// if (/, /.test(str)) {
-//   console.log("here");
-//   // console.log(`result ${str}`, str.split(", ").some(isInvalidScope));
-//   const scopes = str.split(", ");
-
-//   // return str.split(", ").some(async (s) => await isInvalidScope(s));
-//   return await Promise.all(scopes.map(isInvalidScope));
-// }
-
 const isInvalidNodeScope = (str, allNodesDisplayNames) =>
   !allNodesDisplayNames.some((name) => str.startsWith(name));
 
-const startsWithUpperCase = (str) => /[A-Z]/.test(str.charAt(0));
+const getScopeIssue = async (scope) => {
+  if (scope.endsWith(" Node")) {
+    const names = await getAllNodesDisplayNames();
 
-const endsWithPeriod = (str) => str.charAt(str.length - 1) === ".";
+    if (isInvalidNodeScope(scope, names)) {
+      const closest = getClosestMatch(scope, names);
+      const supplement = `. Did you mean \`${closest} Node\`?`;
+
+      return ERRORS.INVALID_SCOPE + supplement;
+    }
+  } else if (!SCOPES.includes(scope)) {
+    return ERRORS.INVALID_SCOPE;
+  }
+
+  return null;
+};
+
+const startsWithUpperCase = (str) => /^[A-Z]/.test(str);
+
+const endsWithPeriod = (str) => /\.$/.test(str);
 
 const containsTicketNumber = (str) => REGEXES.TICKET.test(str);
 
@@ -105,7 +109,7 @@ const doesNotUsePresentTense = (str) => {
 
 const hasSkipChangelog = (str) => str.includes(NO_CHANGELOG);
 
-const skipChangelogIsNotSuffix = (str) => {
+const skipChangelogIsNotInFinalPosition = (str) => {
   const suffixPattern = [" ", escapeForRegex(NO_CHANGELOG), "$"].join("");
 
   return !new RegExp(suffixPattern).test(str);

@@ -9841,13 +9841,13 @@ const ERRORS = {
   TICKET_NUMBER_PRESENT: "PR title must not contain a ticket number",
   TYPE_NOT_FOUND: "Failed to find type in PR title",
   INVALID_TYPE: `Unknown \`type\` in PR title. Expected one of {${TYPES}}`,
-  INVALID_SCOPE: `Unknown \`scope\` in PR title. Expected one of {${SCOPES}} or a node scope, e.g. Mattermost Node`,
+  INVALID_SCOPE: `Unknown \`scope\` in PR title. Expected one of {${SCOPES}} or a node scope`,
   UPPERCASE_INITIAL_IN_SUBJECT: "First char of subject must be lowercase",
   FINAL_PERIOD_IN_SUBJECT: "Subject must not end with a period",
-  NO_PRESENT_TENSE_IN_SUBJECT:
-    "Subject must use present tense, e.g. `implement` instead of `implemented`",
-  SKIP_CHANGELOG_NOT_SUFFIX:
-    "Changelog must be in suffix position, e.g. `docs(Mattermost Node): fix typo (no-changelog)`",
+  NO_PRESENT_TENSE_IN_SUBJECT: "Subject must use present tense",
+  SKIP_CHANGELOG_NOT_IN_FINAL_POSITION: `\`${NO_CHANGELOG}\` must be located at the end of the subject`,
+  MISSING_WHITESPACE_AFTER_COMMA:
+    "Missing whitespace after comma to separate multiple scopes",
 };
 
 const REGEXES = {
@@ -9855,375 +9855,51 @@ const REGEXES = {
   TICKET: /n8n-\d{3,5}/i,
 };
 
-const ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY = [
-  "Action Network",
-  "ActiveCampaign",
-  "ActiveCampaign Trigger",
-  "Acuity Scheduling Trigger",
-  "Adalo",
-  "Affinity",
-  "Affinity Trigger",
-  "Agile CRM",
-  "Airtable",
-  "Airtable Trigger",
-  "AMQP Sender",
-  "AMQP Trigger",
-  "APITemplate.io",
-  "Asana",
-  "Asana Trigger",
-  "Automizy",
-  "Autopilot",
-  "Autopilot Trigger",
-  "AWS Lambda",
-  "AWS SNS",
-  "AWS SNS Trigger",
-  "AWS Comprehend",
-  "AWS DynamoDB",
-  "AWS Rekognition",
-  "AWS S3",
-  "AWS SES",
-  "AWS SQS",
-  "AWS Textract",
-  "AWS Transcribe",
-  "BambooHR",
-  "Bannerbear",
-  "Baserow",
-  "Beeminder",
-  "Bitbucket Trigger",
-  "Bitly",
-  "Bitwarden",
-  "Box",
-  "Box Trigger",
-  "Brandfetch",
-  "Bubble",
-  "Cal Trigger",
-  "Calendly Trigger",
-  "Chargebee",
-  "Chargebee Trigger",
-  "CircleCI",
-  "Webex by Cisco",
-  "Webex by Cisco Trigger",
-  "Clearbit",
-  "ClickUp",
-  "ClickUp Trigger",
-  "Clockify",
-  "Clockify Trigger",
-  "Cockpit",
-  "Coda",
-  "CoinGecko",
-  "Compression",
-  "Contentful",
-  "ConvertKit",
-  "ConvertKit Trigger",
-  "Copper",
-  "Copper Trigger",
-  "Cortex",
-  "CrateDB",
-  "Cron",
-  "Crypto",
-  "Customer.io",
-  "Customer.io Trigger",
-  "Date & Time",
-  "DeepL",
-  "Demio",
-  "DHL",
-  "Discord",
-  "Discourse",
-  "Disqus",
-  "Drift",
-  "Dropbox",
-  "Dropcontact",
-  "Edit Image",
-  "E-goi",
-  "Elasticsearch",
-  "Elastic Security",
-  "EmailReadImap",
-  "Send Email",
-  "Emelia",
-  "Emelia Trigger",
-  "ERPNext",
-  "Error Trigger",
-  "Eventbrite Trigger",
-  "Execute Command",
-  "Execute Workflow",
-  "Facebook Graph API",
-  "Facebook Trigger",
-  "Figma Trigger (Beta)",
-  "FileMaker",
-  "Flow",
-  "Flow Trigger",
-  "Form.io Trigger",
-  "Formstack Trigger",
-  "Freshdesk",
-  "Freshservice",
-  "Freshworks CRM",
-  "FTP",
-  "Function",
-  "Function Item",
-  "GetResponse",
-  "GetResponse Trigger",
-  "Ghost",
-  "Git",
-  "GitHub",
-  "Github Trigger",
-  "GitLab",
-  "GitLab Trigger",
-  "Google Ads",
-  "Google Analytics",
-  "Google BigQuery",
-  "Google Books",
-  "Google Calendar",
-  "Google Calendar Trigger",
-  "Google Chat",
-  "Google Cloud Natural Language",
-  "Google Cloud Storage",
-  "Google Contacts",
-  "Google Docs",
-  "Google Drive",
-  "Google Drive Trigger",
-  "Google Cloud Firestore",
-  "Google Cloud Realtime Database",
-  "Gmail",
-  "Gmail Trigger",
-  "G Suite Admin",
-  "Google Perspective",
-  "Google Sheets ",
-  "Google Slides",
-  "Google Tasks",
-  "Google Translate",
-  "YouTube",
-  "Gotify",
-  "GoToWebinar",
-  "Grafana",
-  "GraphQL",
-  "Grist",
-  "Gumroad Trigger",
-  "Hacker News",
-  "HaloPSA",
-  "Harvest",
-  "HelpScout",
-  "HelpScout Trigger",
-  "HighLevel",
-  "Home Assistant",
-  "HTML Extract",
-  "HTTP Request",
-  "HubSpot",
-  "HubSpot Trigger",
-  "Humantic AI",
-  "Hunter",
-  "iCalendar",
-  "IF",
-  "Intercom",
-  "Interval",
-  "Invoice Ninja",
-  "Invoice Ninja Trigger",
-  "Item Lists",
-  "Iterable",
-  "Jenkins",
-  "Jira Software",
-  "Jira Trigger",
-  "JotForm Trigger",
-  "Kafka",
-  "Kafka Trigger",
-  "Keap",
-  "Keap Trigger",
-  "Kitemaker",
-  "KoBoToolbox",
-  "KoBoToolbox Trigger",
-  "Lemlist",
-  "Lemlist Trigger",
-  "Line",
-  "Linear",
-  "Linear Trigger",
-  "LingvaNex",
-  "LinkedIn",
-  "Local File Trigger",
-  "Magento 2",
-  "Mailcheck",
-  "Mailchimp",
-  "Mailchimp Trigger",
-  "MailerLite",
-  "MailerLite Trigger",
-  "Mailgun",
-  "Mailjet",
-  "Mailjet Trigger",
-  "Mandrill",
-  "Markdown",
-  "Marketstack",
-  "Matrix",
-  "Mattermost",
-  "Mautic",
-  "Mautic Trigger",
-  "Medium",
-  "Merge",
-  "MessageBird",
-  "Metabase",
-  "Microsoft Dynamics CRM",
-  "Microsoft Excel",
-  "Microsoft Graph Security",
-  "Microsoft OneDrive",
-  "Microsoft Outlook",
-  "Microsoft SQL",
-  "Microsoft Teams",
-  "Microsoft To Do",
-  "Mindee",
-  "MISP",
-  "Mocean",
-  "Monday.com",
-  "MongoDB",
-  "Monica CRM",
-  "Move Binary Data",
-  "MQTT",
-  "MQTT Trigger",
-  "MSG91",
-  "MySQL",
-  "n8n",
-  "Customer Datastore (n8n training)",
-  "Customer Messenger (n8n training)",
-  "n8n Trigger",
-  "NASA",
-  "Netlify",
-  "Netlify Trigger",
-  "Nextcloud",
-  "NocoDB",
-  "SendInBlue",
-  "SendInBlue Trigger",
-  "Sticky Note",
-  "No Operation, do nothing",
-  "Onfleet",
-  "Onfleet Trigger",
-  "Notion (Beta)",
-  "Notion Trigger (Beta)",
-  "Odoo",
-  "One Simple API",
-  "OpenThesaurus",
-  "OpenWeatherMap",
-  "Orbit",
-  "Oura",
-  "Paddle",
-  "PagerDuty",
-  "PayPal",
-  "PayPal Trigger",
-  "Peekalink",
-  "Phantombuster",
-  "Philips Hue",
-  "Pipedrive",
-  "Pipedrive Trigger",
-  "Plivo",
-  "PostBin",
-  "Postgres",
-  "PostHog",
-  "Postmark Trigger",
-  "ProfitWell",
-  "Pushbullet",
-  "Pushcut",
-  "Pushcut Trigger",
-  "Pushover",
-  "QuestDB",
-  "Quick Base",
-  "QuickBooks Online",
-  "RabbitMQ",
-  "RabbitMQ Trigger",
-  "Raindrop",
-  "Read Binary File",
-  "Read Binary Files",
-  "Read PDF",
-  "Reddit",
-  "Redis",
-  "Redis Trigger",
-  "Rename Keys",
-  "Respond to Webhook",
-  "RocketChat",
-  "RSS Read",
-  "Rundeck",
-  "S3",
-  "Salesforce",
-  "Salesmate",
-  "SeaTable",
-  "SeaTable Trigger",
-  "SecurityScorecard",
-  "Segment",
-  "SendGrid",
-  "Sendy",
-  "Sentry.io",
-  "ServiceNow",
-  "Set",
-  "Shopify",
-  "Shopify Trigger",
-  "SIGNL4",
-  "Slack",
-  "sms77",
-  "Snowflake",
-  "Split In Batches",
-  "Splunk",
-  "Spontit",
-  "Spotify",
-  "Spreadsheet File",
-  "SSE Trigger",
-  "SSH",
-  "Stackby",
-  "Start",
-  "Stop and Error",
-  "Storyblok",
-  "Strapi",
-  "Strava",
-  "Strava Trigger",
-  "Stripe",
-  "Stripe Trigger",
-  "Supabase",
-  "SurveyMonkey Trigger",
-  "Switch",
-  "SyncroMSP",
-  "Taiga",
-  "Taiga Trigger",
-  "Tapfiliate",
-  "Telegram",
-  "Telegram Trigger",
-  "TheHive",
-  "TheHive Trigger",
-  "TimescaleDB",
-  "Todoist",
-  "Toggl Trigger",
-  "TravisCI",
-  "Trello",
-  "Trello Trigger",
-  "Twake",
-  "Twilio",
-  "Twist",
-  "Twitter",
-  "Typeform Trigger",
-  "Unleashed Software",
-  "Uplead",
-  "uProc",
-  "UptimeRobot",
-  "urlscan.io",
-  "Vero",
-  "Vonage",
-  "Wait",
-  "Webflow",
-  "Webflow Trigger",
-  "Webhook",
-  "Wekan",
-  "WhatsApp Business Cloud",
-  "Wise",
-  "Wise Trigger",
-  "WooCommerce",
-  "WooCommerce Trigger",
-  "Wordpress",
-  "Workable Trigger",
-  "Workflow Trigger",
-  "Write Binary File",
-  "Wufoo Trigger",
-  "Xero",
-  "XML",
-  "Yourls",
-  "Zammad",
-  "Zendesk",
-  "Zendesk Trigger",
-  "Zoho CRM",
-  "Zoom",
-  "Zulip",
-];
+module.exports = {
+  TYPES,
+  SCOPES,
+  NO_CHANGELOG,
+  ERRORS,
+  REGEXES,
+};
+
+
+/***/ }),
+
+/***/ 2241:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const { exec: callbackExec } = __nccwpck_require__(2081);
+const { promisify } = __nccwpck_require__(3837);
+const exec = promisify(callbackExec);
+const { PARSER_CONTENT } = __nccwpck_require__(1304);
+
+/**
+ * @returns { Promise<string[]> } e.g. ["Action Network", "Active Campaign", etc.]
+ */
+async function getAllNodesDisplayNames() {
+  try {
+    await exec(
+      `npm i typescript; touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`
+    );
+    const result = await exec("npx ts-node parser.ts");
+
+    return JSON.parse(result.stdout);
+  } catch (error) {
+    console.error("Failed to generate list of node display names");
+    console.error(error);
+  }
+}
+
+module.exports = {
+  getAllNodesDisplayNames,
+};
+
+
+/***/ }),
+
+/***/ 1304:
+/***/ ((module) => {
 
 const PARSER_CONTENT = `
 import { readFileSync } from 'fs';
@@ -10356,42 +10032,7 @@ function extractDisplayNameFromInitializer(
 getDisplayNames().then((result) => console.log(JSON.stringify(result)));
 `.replace(/'/g, '\\"');
 
-module.exports = {
-  TYPES,
-  SCOPES,
-  NO_CHANGELOG,
-  ERRORS,
-  REGEXES,
-  ALL_NODES_DISPLAY_NAMES_FOR_TESTING_ONLY,
-  PARSER_CONTENT,
-};
-
-
-/***/ }),
-
-/***/ 2241:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const { exec: callbackExec } = __nccwpck_require__(2081);
-const { promisify } = __nccwpck_require__(3837);
-const exec = promisify(callbackExec);
-const { PARSER_CONTENT } = __nccwpck_require__(4438);
-
-/**
- * @returns { Promise<string[]> } e.g. ["Action Network", "Active Campaign", etc.]
- */
-async function getAllNodesDisplayNames() {
-  await exec(
-    `npm i typescript; touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`
-  );
-  const result = await exec("npx ts-node parser.ts");
-
-  return JSON.parse(result.stdout);
-}
-
-module.exports = {
-  getAllNodesDisplayNames,
-};
+module.exports = { PARSER_CONTENT };
 
 
 /***/ }),
@@ -10405,7 +10046,7 @@ const { getAllNodesDisplayNames } = __nccwpck_require__(2241);
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = __nccwpck_require__(4438);
 
 /**
- * Validate that a pull request title conforms to n8n's version of the Conventional Commits spec.
+ * Validate that a pull request title match n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
@@ -10436,15 +10077,14 @@ async function validatePrTitle(title) {
 
   const { scope } = match.groups;
 
-  if (scope && isBaseInvalidScope(scope) && !scope.endsWith(" Node")) {
-    issues.push(ERRORS.INVALID_SCOPE);
-  } else if (scope && scope.endsWith(" Node")) {
-    const names = await getAllNodesDisplayNames();
-
-    if (isInvalidNodeScope(scope, names)) {
-      const closest = getClosestMatch(scope, names);
-      const supplement = `. Did you mean \`${closest} Node\`?`;
-      issues.push(ERRORS.INVALID_SCOPE + supplement);
+  if (scope) {
+    if (/,\S/.test(scope)) {
+      issues.push(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);
+    } else {
+      const scopeIssues = await Promise.all(
+        scope.split(", ").map(getScopeIssue)
+      );
+      issues.push(...scopeIssues.filter((scopeIssue) => scopeIssue !== null));
     }
   }
 
@@ -10464,8 +10104,8 @@ async function validatePrTitle(title) {
     issues.push(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
   }
 
-  if (hasSkipChangelog(subject) && skipChangelogIsNotSuffix(subject)) {
-    issues.push(ERRORS.SKIP_CHANGELOG_NOT_SUFFIX);
+  if (hasSkipChangelog(subject) && skipChangelogIsNotInFinalPosition(subject)) {
+    issues.push(ERRORS.SKIP_CHANGELOG_NOT_IN_FINAL_POSITION);
   }
 
   return issues;
@@ -10477,24 +10117,29 @@ async function validatePrTitle(title) {
 
 const isInvalidType = (str) => !TYPES.includes(str);
 
-const isBaseInvalidScope = (str) =>
-  !SCOPES.some((scope) => str.includes(scope));
-
-// if (/, /.test(str)) {
-//   console.log("here");
-//   // console.log(`result ${str}`, str.split(", ").some(isInvalidScope));
-//   const scopes = str.split(", ");
-
-//   // return str.split(", ").some(async (s) => await isInvalidScope(s));
-//   return await Promise.all(scopes.map(isInvalidScope));
-// }
-
 const isInvalidNodeScope = (str, allNodesDisplayNames) =>
   !allNodesDisplayNames.some((name) => str.startsWith(name));
 
-const startsWithUpperCase = (str) => /[A-Z]/.test(str.charAt(0));
+const getScopeIssue = async (scope) => {
+  if (scope.endsWith(" Node")) {
+    const names = await getAllNodesDisplayNames();
 
-const endsWithPeriod = (str) => str.charAt(str.length - 1) === ".";
+    if (isInvalidNodeScope(scope, names)) {
+      const closest = getClosestMatch(scope, names);
+      const supplement = `. Did you mean \`${closest} Node\`?`;
+
+      return ERRORS.INVALID_SCOPE + supplement;
+    }
+  } else if (!SCOPES.includes(scope)) {
+    return ERRORS.INVALID_SCOPE;
+  }
+
+  return null;
+};
+
+const startsWithUpperCase = (str) => /^[A-Z]/.test(str);
+
+const endsWithPeriod = (str) => /\.$/.test(str);
 
 const containsTicketNumber = (str) => REGEXES.TICKET.test(str);
 
@@ -10506,7 +10151,7 @@ const doesNotUsePresentTense = (str) => {
 
 const hasSkipChangelog = (str) => str.includes(NO_CHANGELOG);
 
-const skipChangelogIsNotSuffix = (str) => {
+const skipChangelogIsNotInFinalPosition = (str) => {
   const suffixPattern = [" ", escapeForRegex(NO_CHANGELOG), "$"].join("");
 
   return !new RegExp(suffixPattern).test(str);
