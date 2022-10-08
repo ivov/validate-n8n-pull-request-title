@@ -1,3 +1,9 @@
+/**
+ * To simulate GH action run, copy `parserContent.js` and `getAllNodesDisplayNames.js` to n8n root,
+ * append `getAllNodesDisplayNames().then((result) => console.log(JSON.stringify(result, null, 2)));`
+ * to `getAllNodesDisplayNames.js` and run `node getAllNodesDisplayNames.js`
+ */
+
 const PARSER_CONTENT = `
 import path from 'path';
 import { readFileSync } from 'fs';
@@ -188,7 +194,7 @@ function isClassDeclaration(node: ts.Node): node is ts.ClassDeclaration {
 
 getDisplayNames().then((result) => console.log(JSON.stringify(result, null, 2)));
 `
-  .replace(/'/g, '\\"')
-  .replace(/`/g, "\\`"); // ensure `echo "{var}"` prints quotes as intended
+  .replace(/'/g, '\\"') // ensure `echo "{var}"` prints quotes as intended
+  .replace(/`/g, "\\`");
 
 module.exports = { PARSER_CONTENT };
