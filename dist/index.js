@@ -9901,6 +9901,12 @@ module.exports = {
 /***/ 1304:
 /***/ ((module) => {
 
+/**
+ * To simulate GH action run, copy `parserContent.js` and `getAllNodesDisplayNames.js` to n8n root,
+ * append `getAllNodesDisplayNames().then((result) => console.log(JSON.stringify(result, null, 2)));`
+ * to `getAllNodesDisplayNames.js` and run `node getAllNodesDisplayNames.js`
+ */
+
 const PARSER_CONTENT = `
 import path from 'path';
 import { readFileSync } from 'fs';
@@ -10091,8 +10097,8 @@ function isClassDeclaration(node: ts.Node): node is ts.ClassDeclaration {
 
 getDisplayNames().then((result) => console.log(JSON.stringify(result, null, 2)));
 `
-  .replace(/'/g, '\\"')
-  .replace(/`/g, "\\`"); // ensure `echo "{var}"` prints quotes as intended
+  .replace(/'/g, '\\"') // ensure `echo "{var}"` prints quotes as intended
+  .replace(/`/g, "\\`");
 
 module.exports = { PARSER_CONTENT };
 
@@ -10414,10 +10420,6 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const { exec: callbackExec } = __nccwpck_require__(2081);
-const { promisify } = __nccwpck_require__(3837);
-const exec = promisify(callbackExec);
-
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
