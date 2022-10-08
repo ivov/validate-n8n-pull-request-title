@@ -32,18 +32,6 @@ async function run() {
       pull_number: contextPullRequest.number,
     });
 
-    // if (/\(.* Node\)/.test(pullRequest.title)) {
-    //   try {
-    //     // console.log("cwd", process.cwd());
-    //     // await exec("npm i typescript fast-glob");
-    //     // await exec(`touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`);
-    //     // const execResult = await exec("npx ts-node parser.ts");
-    //     // console.log(execResult);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-
     const issues = await validatePrTitle(pullRequest.title);
 
     if (issues.length > 0) {
