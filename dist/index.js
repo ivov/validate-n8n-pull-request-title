@@ -10197,6 +10197,9 @@ const getScopeIssue = async (scope) => {
     const names = await getAllNodesDisplayNames();
 
     if (isInvalidNodeScope(scope, names)) {
+      console.log("Invalid node scope");
+      console.log("scope", scope);
+      console.log("names", names);
       const closest = getClosestMatch(scope, names);
       const supplement = `. Did you mean \`${closest} Node\`?`;
 
