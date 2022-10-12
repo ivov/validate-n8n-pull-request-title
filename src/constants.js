@@ -15,14 +15,15 @@ const NO_CHANGELOG = "(no-changelog)";
 
 const ERRORS = {
   CONVENTIONAL_SCHEMA_MISMATCH: [
-    "PR title does not conform to PR title convention.",
-    `Please use \`type(scope): subject\` or \`type: subject\`, where \`type\` is one of {${TYPES}} and scope is one of {${SCOPES}} or may be omitted.`,
-    "For the subject, mind the whitespace, use initial lowercase and omit final period.",
-  ].join("\n"),
+    "PR title does not match PR title convention: type: subject or type(scope): subject",
+    `For \`type\`, use \`type:\` or \`type(scope):\`, where \`type\` is one of {${TYPES}}`,
+    `If present, \`scope\` must be one of {${SCOPES}} or \`<displayName> Node\``,
+    "For the subject, mind the whitespace, start with lowercase and omit final period",
+  ].join(". "),
   TICKET_NUMBER_PRESENT: "PR title must not contain a ticket number",
-  TYPE_NOT_FOUND: "Failed to find type in PR title",
+  TYPE_NOT_FOUND: `Failed to find \`type\` in PR title. Expected one of {${TYPES}}`,
   INVALID_TYPE: `Unknown \`type\` in PR title. Expected one of {${TYPES}}`,
-  INVALID_SCOPE: `Unknown \`scope\` in PR title. Expected one of {${SCOPES}} or a node scope`,
+  INVALID_SCOPE: `Unknown \`scope\` in PR title. Expected one of {${SCOPES}} or \`<displayName> Node\``,
   UPPERCASE_INITIAL_IN_SUBJECT: "First char of subject must be lowercase",
   FINAL_PERIOD_IN_SUBJECT: "Subject must not end with a period",
   NO_PRESENT_TENSE_IN_SUBJECT: "Subject must use present tense",

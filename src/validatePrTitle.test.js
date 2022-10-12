@@ -71,7 +71,7 @@ describe("scope", () => {
     expect(issues).toHaveLength(2).toContain(ERRORS.INVALID_SCOPE);
   });
 
-  test("Validation should fail for title with wrongly delimited valid scopes", async () => {
+  test("Validation should fail for title with misdelimited valid scopes", async () => {
     expect(await validate("feat(core,editor): implement feature"))
       .toHaveLength(1)
       .toContain(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);

@@ -22,3 +22,24 @@ jobs:
         uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post validation issue comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: always() # ensure workflow continues executing despite validation errors
+        with:
+          header: pr_title_failed_validation # tag comment for later deletion
+          message: |
+            Thank you for your contribution!
+
+            PR titles in this repo follow our version of the Conventional Commits spec.
+            This allows us to automatically generate the changelog for the next release.
+            Therefore, we ask you to adjust your PR title to solve the issue(s) below:
+
+            ${{ steps.validate_pr_title.outputs.validation_issues }}
+
+      - name: Remove validation issue comment
+        if: ${{ steps.validate_pr_title.outputs.validation_issues == null }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr_title_failed_validation
+          delete: true # delete prior comment when issue is resolved

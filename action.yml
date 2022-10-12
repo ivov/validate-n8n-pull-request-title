@@ -6,4 +6,4 @@ runs:
   main: "dist/index.js"
 outputs:
   validation_issues:
-    description: "Validation issues detected in the PR title"
+    description: "Validation issues detected in PR title, as markdown bullet list"
