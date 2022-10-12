@@ -9922,7 +9922,6 @@ import ts from 'typescript';
 const NODES_DIR = path.resolve('packages', 'nodes-base', 'nodes');
 
 async function getDisplayNames() {
-	console.log(path.resolve(NODES_DIR, '**', '*.node.ts'));
 	const [nodeFilepaths, versionDescriptionFilepaths] = await Promise.all([
 		glob(path.resolve(NODES_DIR, '**', '*.node.ts')),
 		glob(path.resolve(NODES_DIR, '**', 'versionDescription.ts')),
@@ -10199,15 +10198,15 @@ const getScopeIssue = async (scope) => {
   if (scope.endsWith(" Node")) {
     const names = await getAllNodesDisplayNames();
 
-    if (isInvalidNodeScope(scope, names)) {
-      console.log("Invalid node scope");
-      console.log("scope", scope);
-      console.log("names", names);
-      const closest = getClosestMatch(scope, names);
-      const supplement = `. Did you mean \`${closest} Node\`?`;
+    // if (isInvalidNodeScope(scope, names)) {
+    //   console.log("Invalid node scope");
+    //   console.log("scope", scope);
+    //   console.log("names", names);
+    //   const closest = getClosestMatch(scope, names);
+    //   const supplement = `. Did you mean \`${closest} Node\`?`;
 
-      return ERRORS.INVALID_SCOPE + supplement;
-    }
+    //   return ERRORS.INVALID_SCOPE + supplement;
+    // }
   } else if (!SCOPES.includes(scope)) {
     return ERRORS.INVALID_SCOPE;
   }

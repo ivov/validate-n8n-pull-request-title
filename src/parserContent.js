@@ -13,7 +13,6 @@ import ts from 'typescript';
 const NODES_DIR = path.resolve('packages', 'nodes-base', 'nodes');
 
 async function getDisplayNames() {
-	console.log(path.resolve(NODES_DIR, '**', '*.node.ts'));
 	const [nodeFilepaths, versionDescriptionFilepaths] = await Promise.all([
 		glob(path.resolve(NODES_DIR, '**', '*.node.ts')),
 		glob(path.resolve(NODES_DIR, '**', 'versionDescription.ts')),
