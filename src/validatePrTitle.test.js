@@ -87,17 +87,17 @@ describe("scope", () => {
     expect(issues).toHaveLength(1).toContain(ERRORS.INVALID_SCOPE);
   });
 
-  test("Validation should fail for misspelled node scope", async () => {
-    let issues = await validate("feat(Mattermos Node): change default value");
-    expect(issues)
-      .toHaveLength(1)
-      .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Mattermost Node`?");
+  // test("Validation should fail for misspelled node scope", async () => {
+  //   let issues = await validate("feat(Mattermos Node): change default value");
+  //   expect(issues)
+  //     .toHaveLength(1)
+  //     .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Mattermost Node`?");
 
-    issues = await validate("feat(Gmai Trigger Node): change default value");
-    expect(issues)
-      .toHaveLength(1)
-      .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Gmail Trigger Node`?");
-  });
+  //   issues = await validate("feat(Gmai Trigger Node): change default value");
+  //   expect(issues)
+  //     .toHaveLength(1)
+  //     .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Gmail Trigger Node`?");
+  // });
 });
 
 describe("subject", () => {
@@ -113,23 +113,22 @@ describe("subject", () => {
     expect(issues).toHaveLength(1).toContain(ERRORS.FINAL_PERIOD_IN_SUBJECT);
   });
 
-  // test("Validation should pass for present-tense verb", async () => {
-  //   const issues = await validate("feat(editor): update something");
-  //   expect(issues).toHaveLength(0);
-  // });
+  test("Validation should pass for present-tense verb", async () => {
+    const issues = await validate("feat(editor): update something");
+    expect(issues).toHaveLength(0);
+  });
 
-  // test("Validation should fail for non-present-tense verb", async () => {
-  //   [
-  //     "feat(Mattermost Node): added new resource",
-  //     "feat(Mattermost Node): created new resource",
-  //     "fix(Mattermost Node): caught error",
-  //   ].forEach(async (title) => {
-  //     const issues = await validate(title);
-  //     expect(issues)
-  //       .toHaveLength(1)
-  //       .toContain(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
-  //   });
-  // });
+  test("Validation should fail for non-present-tense verb", async () => {
+    [
+      "feat(Mattermost Node): added new resource",
+      "feat(Mattermost Node): created new resource",
+    ].forEach(async (title) => {
+      const issues = await validate(title);
+      expect(issues)
+        .toHaveLength(1)
+        .toContain(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
+    });
+  });
 
   test("Validation should pass for breaking-change indicator `!`", async () => {
     const issues = await validate("feat(Oura Node)!: change default value");
