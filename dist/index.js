@@ -10305,7 +10305,7 @@ async function run() {
       console.error("PR title failed validation");
       core.setOutput(
         "validation_issues",
-        issues.map((issue) => `- ${issue}`).join("<br/>")
+        issues.map((issue) => `- ${issue}`).join("\n")
       );
 
       throw new Error(issues);
