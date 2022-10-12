@@ -13,6 +13,8 @@ async function getAllNodesDisplayNames() {
     );
     const result = await exec("npx ts-node parser.ts");
 
+    console.log(result);
+
     return JSON.parse(result.stdout);
   } catch (error) {
     console.error("Failed to generate list of node display names");
