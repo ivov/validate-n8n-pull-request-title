@@ -58,9 +58,9 @@ async function validatePrTitle(title) {
     issues.push(ERRORS.FINAL_PERIOD_IN_SUBJECT);
   }
 
-  if (doesNotUsePresentTense(subject)) {
-    issues.push(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
-  }
+  // if (doesNotUsePresentTense(subject)) {
+  //   issues.push(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
+  // }
 
   if (hasSkipChangelog(subject) && skipChangelogIsNotInFinalPosition(subject)) {
     issues.push(ERRORS.SKIP_CHANGELOG_NOT_IN_FINAL_POSITION);
@@ -101,11 +101,11 @@ const endsWithPeriod = (str) => /\.$/.test(str);
 
 const containsTicketNumber = (str) => REGEXES.TICKET.test(str);
 
-const doesNotUsePresentTense = (str) => {
-  const verb = str.split(" ").shift();
+// const doesNotUsePresentTense = (str) => {
+//   const verb = str.split(" ").shift();
 
-  return verb !== toBaseForm(verb);
-};
+//   return verb !== toBaseForm(verb);
+// };
 
 const hasSkipChangelog = (str) => str.includes(NO_CHANGELOG);
 

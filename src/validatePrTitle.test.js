@@ -113,18 +113,23 @@ describe("subject", () => {
     expect(issues).toHaveLength(1).toContain(ERRORS.FINAL_PERIOD_IN_SUBJECT);
   });
 
-  test("Validation should fail for non-present-tense verb", async () => {
-    [
-      "feat(Mattermost Node): added new resource",
-      "feat(Mattermost Node): created new resource",
-      "fix(Mattermost Node): caught error",
-    ].forEach(async (title) => {
-      const issues = await validate(title);
-      expect(issues)
-        .toHaveLength(1)
-        .toContain(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
-    });
-  });
+  // test("Validation should pass for present-tense verb", async () => {
+  //   const issues = await validate("feat(editor): update something");
+  //   expect(issues).toHaveLength(0);
+  // });
+
+  // test("Validation should fail for non-present-tense verb", async () => {
+  //   [
+  //     "feat(Mattermost Node): added new resource",
+  //     "feat(Mattermost Node): created new resource",
+  //     "fix(Mattermost Node): caught error",
+  //   ].forEach(async (title) => {
+  //     const issues = await validate(title);
+  //     expect(issues)
+  //       .toHaveLength(1)
+  //       .toContain(ERRORS.NO_PRESENT_TENSE_IN_SUBJECT);
+  //   });
+  // });
 
   test("Validation should pass for breaking-change indicator `!`", async () => {
     const issues = await validate("feat(Oura Node)!: change default value");
