@@ -87,17 +87,17 @@ describe("scope", () => {
     expect(issues).toHaveLength(1).toContain(ERRORS.INVALID_SCOPE);
   });
 
-  // test("Validation should fail for misspelled node scope", async () => {
-  //   let issues = await validate("feat(Mattermos Node): change default value");
-  //   expect(issues)
-  //     .toHaveLength(1)
-  //     .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Mattermost Node`?");
+  test("Validation should fail for misspelled node scope", async () => {
+    let issues = await validate("feat(Mattermos Node): change default value");
+    expect(issues)
+      .toHaveLength(1)
+      .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Mattermost Node`?");
 
-  //   issues = await validate("feat(Gmai Trigger Node): change default value");
-  //   expect(issues)
-  //     .toHaveLength(1)
-  //     .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Gmail Trigger Node`?");
-  // });
+    issues = await validate("feat(Gmai Trigger Node): change default value");
+    expect(issues)
+      .toHaveLength(1)
+      .toContain(ERRORS.INVALID_SCOPE + ". Did you mean `Gmail Trigger Node`?");
+  });
 });
 
 describe("subject", () => {

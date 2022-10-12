@@ -81,15 +81,17 @@ const getScopeIssue = async (scope) => {
   if (scope.endsWith(" Node")) {
     const names = await getAllNodesDisplayNames();
 
-    // if (isInvalidNodeScope(scope, names)) {
-    //   console.log("Invalid node scope");
-    //   console.log("scope", scope);
-    //   console.log("names", names);
-    //   const closest = getClosestMatch(scope, names);
-    //   const supplement = `. Did you mean \`${closest} Node\`?`;
+    if (names.length === 0) {
+      console.log("Failed to find all nodes display names. Skipping check...");
+      return null;
+    }
 
-    //   return ERRORS.INVALID_SCOPE + supplement;
-    // }
+    if (isInvalidNodeScope(scope, names)) {
+      const closest = getClosestMatch(scope, names);
+      const supplement = `. Did you mean \`${closest} Node\`?`;
+
+      return ERRORS.INVALID_SCOPE + supplement;
+    }
   } else if (!SCOPES.includes(scope)) {
     return ERRORS.INVALID_SCOPE;
   }

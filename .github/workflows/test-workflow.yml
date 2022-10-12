@@ -6,12 +6,21 @@ on:
       - opened
       - edited
       - synchronize
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   validate_pr_title:
     name: Validate PR title
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      checks: write
+      pull-request: read
+      contents: read
     steps:
       # Checkout only needed for testing in own repo
       # Omit checkout when adding to separate repo
@@ -25,9 +34,9 @@ jobs:
 
       - name: Post validation issue comment
         uses: marocchino/sticky-pull-request-comment@v2
-        if: always() # ensure workflow continues executing despite validation errors
+        if: always()
         with:
-          header: pr_title_failed_validation # tag comment for later deletion
+          header: pr_title_failed_validation
           message: |
             Thank you for your contribution!
 
@@ -42,4 +51,4 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_title_failed_validation
-          delete: true # delete prior comment when issue is resolved
+          delete: true
