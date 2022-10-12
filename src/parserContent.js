@@ -18,8 +18,6 @@ async function getDisplayNames() {
 		glob(path.resolve(NODES_DIR, '**', 'versionDescription.ts')),
 	]);
 
-	console.log('nodeFilepaths', nodeFilepaths);
-
 	const nodeFiles = nodeFilepaths.reduce<string[]>((acc, cur) => {
 		let displayName = fromMajorityNodeFile(cur);
 
