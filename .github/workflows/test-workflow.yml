@@ -22,8 +22,6 @@ jobs:
       pull-request: read
       contents: read
     steps:
-      # Checkout only needed for testing in own repo
-      # Omit checkout when adding to separate repo
       - name: Clone repository to runner
         uses: actions/checkout@v3
 
