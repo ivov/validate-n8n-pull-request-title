@@ -14,7 +14,7 @@ jest
 
 describe("schema", () => {
   test("Validation should fail for conventional schema mismatch", () => {
-    ["feat(core):", "feat(core)", "feat(core):Implement feature"].forEach(
+    ["feat(core):", "feat(core)", "feat(core): Implement feature"].forEach(
       async (title) => {
         const issues = await validate(title);
         expect(issues)
