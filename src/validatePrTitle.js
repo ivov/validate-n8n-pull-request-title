@@ -3,7 +3,7 @@ const { getAllNodesDisplayNames } = require("./getAllNodesDisplayNames");
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = require("./constants");
 
 /**
- * Validate that a pull request title match n8n's version of the Conventional Commits spec.
+ * Validate that a pull request title matches n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
@@ -39,7 +39,7 @@ async function validatePrTitle(title) {
       issues.push(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);
     } else {
       const scopeIssues = await Promise.all(
-        scope.split(", ").map(getScopeIssue)
+        scope.split(", ").map(getScopeIssue),
       );
       issues.push(...scopeIssues.filter((scopeIssue) => scopeIssue !== null));
     }
@@ -49,8 +49,8 @@ async function validatePrTitle(title) {
 
   const { subject } = match.groups;
 
-  if (startsWithUpperCase(subject)) {
-    issues.push(ERRORS.UPPERCASE_INITIAL_IN_SUBJECT);
+  if (startsWithLowerCase(subject)) {
+    issues.push(ERRORS.LOWERCASE_INITIAL_IN_SUBJECT);
   }
 
   if (endsWithPeriod(subject)) {
@@ -99,7 +99,7 @@ const getScopeIssue = async (scope) => {
   return null;
 };
 
-const startsWithUpperCase = (str) => /^[A-Z]/.test(str);
+const startsWithLowerCase = (str) => /^[a-z]/.test(str);
 
 const endsWithPeriod = (str) => /\.$/.test(str);
 

@@ -9,7 +9,7 @@ async function run() {
 
     if (!contextPullRequest) {
       throw new Error(
-        "This action may only be triggered by `pull_request` events. Set `pull_request` in the `on` section in your workflow."
+        "This action may only be triggered by `pull_request` events. Set `pull_request` in the `on` section in your workflow.",
       );
     }
 
@@ -34,7 +34,7 @@ async function run() {
       console.error("PR title failed validation");
       core.setOutput(
         "validation_issues",
-        issues.map((issue) => `- ${issue}`).join("\n")
+        issues.map((issue) => `- ${issue}`).join("\n"),
       );
 
       throw new Error(issues);
