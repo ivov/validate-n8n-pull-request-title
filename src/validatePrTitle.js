@@ -49,8 +49,8 @@ async function validatePrTitle(title) {
 
   const { subject } = match.groups;
 
-  if (startsWithUpperCase(subject)) {
-    issues.push(ERRORS.UPPERCASE_INITIAL_IN_SUBJECT);
+  if (startsWithLowerCase(subject)) {
+    issues.push(ERRORS.LOWERCASE_INITIAL_IN_SUBJECT);
   }
 
   if (endsWithPeriod(subject)) {
@@ -99,7 +99,7 @@ const getScopeIssue = async (scope) => {
   return null;
 };
 
-const startsWithUpperCase = (str) => /^[A-Z]/.test(str);
+const startsWithLowerCase = (str) => /^[a-z]/.test(str);
 
 const endsWithPeriod = (str) => /\.$/.test(str);
 
