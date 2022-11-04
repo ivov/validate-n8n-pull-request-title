@@ -9685,7 +9685,7 @@ const ERRORS = {
   TYPE_NOT_FOUND: `Failed to find \`type\` in PR title. Expected one of ${displayTypes}`,
   INVALID_TYPE: `Unknown \`type\` in PR title. Expected one of ${displayTypes}`,
   INVALID_SCOPE: `Unknown \`scope\` in PR title. Expected one of ${displayScopes} or \`<displayName> Node\``,
-  UPPERCASE_INITIAL_IN_SUBJECT: "First char of subject must be lowercase",
+  LOWERCASE_INITIAL_IN_SUBJECT: "First char of subject must be uppercase",
   FINAL_PERIOD_IN_SUBJECT: "Subject must not end with a period",
   NO_PRESENT_TENSE_IN_SUBJECT: "Subject must use present tense",
   SKIP_CHANGELOG_NOT_IN_FINAL_POSITION: `\`${NO_CHANGELOG}\` must be located at the end of the subject`,
@@ -9723,7 +9723,7 @@ const { PARSER_CONTENT } = __nccwpck_require__(1304);
 async function getAllNodesDisplayNames() {
   try {
     await exec(
-      `npm i typescript fast-glob; npm i -g ts-node; touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`
+      `npm i typescript fast-glob; npm i -g ts-node; touch parser.ts; echo "${PARSER_CONTENT}" > parser.ts`,
     );
     const result = await exec("ts-node parser.ts");
 
@@ -9958,7 +9958,7 @@ const { getAllNodesDisplayNames } = __nccwpck_require__(2241);
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = __nccwpck_require__(4438);
 
 /**
- * Validate that a pull request title match n8n's version of the Conventional Commits spec.
+ * Validate that a pull request title matches n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
@@ -9994,7 +9994,7 @@ async function validatePrTitle(title) {
       issues.push(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);
     } else {
       const scopeIssues = await Promise.all(
-        scope.split(", ").map(getScopeIssue)
+        scope.split(", ").map(getScopeIssue),
       );
       issues.push(...scopeIssues.filter((scopeIssue) => scopeIssue !== null));
     }
@@ -10004,8 +10004,8 @@ async function validatePrTitle(title) {
 
   const { subject } = match.groups;
 
-  if (startsWithUpperCase(subject)) {
-    issues.push(ERRORS.UPPERCASE_INITIAL_IN_SUBJECT);
+  if (startsWithLowerCase(subject)) {
+    issues.push(ERRORS.LOWERCASE_INITIAL_IN_SUBJECT);
   }
 
   if (endsWithPeriod(subject)) {
@@ -10054,7 +10054,7 @@ const getScopeIssue = async (scope) => {
   return null;
 };
 
-const startsWithUpperCase = (str) => /^[A-Z]/.test(str);
+const startsWithLowerCase = (str) => /^[a-z]/.test(str);
 
 const endsWithPeriod = (str) => /\.$/.test(str);
 
@@ -10280,7 +10280,7 @@ async function run() {
 
     if (!contextPullRequest) {
       throw new Error(
-        "This action may only be triggered by `pull_request` events. Set `pull_request` in the `on` section in your workflow."
+        "This action may only be triggered by `pull_request` events. Set `pull_request` in the `on` section in your workflow.",
       );
     }
 
@@ -10305,7 +10305,7 @@ async function run() {
       console.error("PR title failed validation");
       core.setOutput(
         "validation_issues",
-        issues.map((issue) => `- ${issue}`).join("\n")
+        issues.map((issue) => `- ${issue}`).join("\n"),
       );
 
       throw new Error(issues);
