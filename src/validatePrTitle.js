@@ -3,7 +3,7 @@ const { getAllNodesDisplayNames } = require("./getAllNodesDisplayNames");
 const { TYPES, SCOPES, NO_CHANGELOG, ERRORS, REGEXES } = require("./constants");
 
 /**
- * Validate that a pull request title match n8n's version of the Conventional Commits spec.
+ * Validate that a pull request title matches n8n's version of the Conventional Commits spec.
  *
  * See: https://www.notion.so/n8n/Release-Process-fce65faea3d5403a85210f7e7a60d0f8
  */
