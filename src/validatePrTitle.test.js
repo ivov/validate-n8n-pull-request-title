@@ -102,7 +102,7 @@ describe('scope', () => {
 
 describe('subject', () => {
   test('Validation should fail for lowercase initial in subject', async () => {
-    const issues = await validate('feat(core): Implement feature');
+    const issues = await validate('feat(core): implement feature');
     expect(issues)
       .toHaveLength(1)
       .toContain(ERRORS.LOWERCASE_INITIAL_IN_SUBJECT);
