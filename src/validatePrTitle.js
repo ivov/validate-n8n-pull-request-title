@@ -39,7 +39,7 @@ async function validatePrTitle(title) {
       issues.push(ERRORS.MISSING_WHITESPACE_AFTER_COMMA);
     } else {
       const scopeIssues = await Promise.all(
-        scope.split(", ").map(getScopeIssue)
+        scope.split(", ").map(getScopeIssue),
       );
       issues.push(...scopeIssues.filter((scopeIssue) => scopeIssue !== null));
     }

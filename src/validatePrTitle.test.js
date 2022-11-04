@@ -20,7 +20,7 @@ describe("schema", () => {
         expect(issues)
           .toHaveLength(1)
           .toContain(ERRORS.CONVENTIONAL_SCHEMA_MISMATCH);
-      }
+      },
     );
   });
 
