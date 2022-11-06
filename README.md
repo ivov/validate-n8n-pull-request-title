@@ -84,10 +84,23 @@ jobs:
 
 ## Release
 
+```sh
+# 1. update build
+npm run build
+
+# 2. create new tag
+git tag v1.2.0
+git push origin v1.2.0
+
+# 3. create release with new tag
+# https://github.com/ivov/validate-n8n-pull-request-title/releases/new
+
+# 4. move forward major to latest
+git tag -fa v1 -m "Move forward v1 tag"
+git push origin v1 --force
 ```
-git tag -m "Release v1.x.x" v1.x.x
-git push --follow-tags
-```
+
+More info on [versioning](https://github.com/actions/toolkit/blob/main/docs/action-versioning.md).
 
 ## Author
 
