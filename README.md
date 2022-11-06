@@ -87,6 +87,8 @@ jobs:
 ```sh
 # 1. update build
 npm run build
+git add dist
+git commit -m 'Update built action'
 
 # 2. create new tag
 git tag v1.2.0
